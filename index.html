@@ -22,20 +22,23 @@
         <span class="pin-icon" aria-hidden="true">⌖</span>
         <span class="stacked-label"><span class="muted-label">Deliver to</span><strong id="delivery-location">United States</strong></span>
       </button>
-      <form class="search-bar" id="search-form" role="search">
-        <label class="visually-hidden" for="search-department">Search department</label>
-        <select id="search-department">
-          <option value="All">All</option>
-          <option value="Electronics">Electronics</option>
-          <option value="Home">Home &amp; Kitchen</option>
-          <option value="Books">Books</option>
-          <option value="Style">Style</option>
-          <option value="Outdoors">Outdoors</option>
-        </select>
-        <label class="visually-hidden" for="search">Search products</label>
-        <input id="search" type="search" placeholder="Search products" autocomplete="off">
-        <button type="submit" aria-label="Search"><span aria-hidden="true">⌕</span></button>
-      </form>
+      <div class="search-container">
+        <form class="search-bar" id="search-form" role="search">
+          <label class="visually-hidden" for="search-department">Search department</label>
+          <select id="search-department">
+            <option value="All">All</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Home">Home &amp; Kitchen</option>
+            <option value="Books">Books</option>
+            <option value="Style">Style</option>
+            <option value="Outdoors">Outdoors</option>
+          </select>
+          <label class="visually-hidden" for="search">Search products</label>
+          <input id="search" type="search" placeholder="Search products" autocomplete="off" aria-controls="search-suggestions" aria-expanded="false">
+          <button type="submit" aria-label="Search"><span aria-hidden="true">⌕</span></button>
+        </form>
+        <div class="search-suggestions" id="search-suggestions" role="listbox" aria-label="Search suggestions" hidden></div>
+      </div>
       <button class="account nav-item" id="account-button" type="button">
         <span class="muted-label">Hello, sign in</span><strong>Account &amp; Lists</strong>
       </button>
@@ -66,7 +69,13 @@
       <div class="hero-art" role="img" aria-label="Sunny, relaxed home interior">
         <span class="hero-note">A little more<br><strong>inspired</strong></span>
       </div>
-      <div class="hero-pagination" aria-hidden="true"><span class="active"></span><span></span><span></span></div>
+      <button class="hero-arrow hero-previous" type="button" data-hero-step="-1" aria-label="Previous featured collection">‹</button>
+      <button class="hero-arrow hero-next" type="button" data-hero-step="1" aria-label="Next featured collection">›</button>
+      <div class="hero-pagination" aria-label="Featured collections">
+        <button class="active" type="button" data-hero-slide="0" aria-label="Show home refresh"></button>
+        <button type="button" data-hero-slide="1" aria-label="Show tech essentials"></button>
+        <button type="button" data-hero-slide="2" aria-label="Show outdoor favorites"></button>
+      </div>
     </section>
 
     <section class="category-shortcuts" aria-label="Shop by category">
@@ -103,7 +112,30 @@
         <button class="filter-chip" type="button" data-category="Outdoors">Outdoors</button>
         <button class="filter-chip wishlist-filter" id="wishlist-filter" type="button">♡ Saved <span id="wishlist-count">0</span></button>
       </div>
-      <div class="product-grid" id="product-grid" aria-live="polite"></div>
+      <div class="shop-layout">
+        <aside class="filter-sidebar" aria-label="Refine results">
+          <div class="sidebar-title"><strong>Refine by</strong><button id="reset-refinements" type="button">Clear</button></div>
+          <fieldset class="facet">
+            <legend>Price</legend>
+            <label><input type="radio" name="price-filter" value="any" checked> Any price</label>
+            <label><input type="radio" name="price-filter" value="0-25"> Under $25</label>
+            <label><input type="radio" name="price-filter" value="25-50"> $25 to $50</label>
+            <label><input type="radio" name="price-filter" value="50+"> $50 &amp; above</label>
+          </fieldset>
+          <fieldset class="facet">
+            <legend>Customer reviews</legend>
+            <label><input type="radio" name="rating-filter" value="0" checked> All ratings</label>
+            <label><input type="radio" name="rating-filter" value="4"> <span class="facet-stars">★★★★</span> &amp; up</label>
+            <label><input type="radio" name="rating-filter" value="4.5"> <span class="facet-stars">★★★★★</span> &amp; up</label>
+          </fieldset>
+          <fieldset class="facet">
+            <legend>Delivery</legend>
+            <label><input id="prime-filter" type="checkbox"> <span class="prime-word">prime</span> eligible</label>
+            <label><input id="deal-filter" type="checkbox"> On sale</label>
+          </fieldset>
+        </aside>
+        <div class="product-grid" id="product-grid" aria-live="polite"></div>
+      </div>
       <div class="empty-state" id="empty-state" hidden>
         <span aria-hidden="true">⌕</span><h3>No products found</h3><p>Try a different search or category.</p>
         <button class="button button-dark" id="clear-filters" type="button">Clear filters</button>

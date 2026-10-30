@@ -12,6 +12,12 @@ const products = [
   { id: "backpack", name: "Lightweight trail backpack", category: "Outdoors", price: 58.0, oldPrice: 72.0, rating: 4.6, reviews: 511, badge: "Deal", image: "https://images.unsplash.com/photo-1622260614153-03223fb72052?auto=format&fit=crop&w=800&q=80", description: "A lightweight pack with practical storage for day hikes, travel, and everyday adventures." },
   { id: "journal", name: "Linen-bound daily journal", category: "Books", price: 16.5, rating: 4.8, reviews: 334, badge: "Lovely little gift", image: "https://images.unsplash.com/photo-1531346878377-a5be20888e57?auto=format&fit=crop&w=800&q=80", description: "A calm place for notes, plans, sketches, and all the small thoughts you want to keep." }
 ];
+const primeProductIds = new Set(["headphones", "lamp", "speaker", "cookbook", "bottle", "throw", "backpack"]);
+const slides = [
+  { eyebrow: "A FRESH LOOK FOR HOME", title: "Make home feel<br>more like you.", text: "Easy upgrades for the spaces where everyday life happens.", category: "Home", image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=85" },
+  { eyebrow: "UPGRADE YOUR EVERYDAY", title: "Good sound.<br>Good company.", text: "Explore everyday tech for work, play, and everything in between.", category: "Electronics", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=85" },
+  { eyebrow: "READY WHEN YOU ARE", title: "Take the scenic<br>route.", text: "Find practical favorites for your next little adventure.", category: "Outdoors", image: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=85" }
+];
 
 const STORAGE_KEYS = { cart: "everyday-finds-cart", wishlist: "everyday-finds-wishlist" };
 const readStoredValue = (key, fallback) => {
@@ -30,7 +36,7 @@ let wishlist = readStoredValue(STORAGE_KEYS.wishlist, []);
 if (!cart || Array.isArray(cart) || typeof cart !== "object") cart = {};
 if (!Array.isArray(wishlist)) wishlist = [];
 
-const state = { category: "All", dealsOnly: false, wishlistOnly: false, query: "", sort: "featured" };
+const state = { category: "All", dealsOnly: false, wishlistOnly: false, primeOnly: false, price: "any", rating: 0, query: "", sort: "featured" };
 const grid = document.querySelector("#product-grid");
 const emptyState = document.querySelector("#empty-state");
 const cartDrawer = document.querySelector("#cart-drawer");
@@ -69,9 +75,15 @@ function filteredProducts() {
     const categoryMatches = state.category === "All" || product.category === state.category;
     const departmentMatches = department === "All" || product.category === department;
     const dealMatches = !state.dealsOnly || product.oldPrice;
+    const primeMatches = !state.primeOnly || primeProductIds.has(product.id);
+    const ratingMatches = product.rating >= state.rating;
+    const priceMatches = state.price === "any"
+      || (state.price === "0-25" && product.price < 25)
+      || (state.price === "25-50" && product.price >= 25 && product.price <= 50)
+      || (state.price === "50+" && product.price > 50);
     const wishlistMatches = !state.wishlistOnly || wishlist.includes(product.id);
     const queryMatches = !query || `${product.name} ${product.category} ${product.description}`.toLowerCase().includes(query);
-    return categoryMatches && departmentMatches && dealMatches && wishlistMatches && queryMatches;
+    return categoryMatches && departmentMatches && dealMatches && primeMatches && ratingMatches && priceMatches && wishlistMatches && queryMatches;
   });
 
   if (state.sort === "price-low") visible = visible.sort((a, b) => a.price - b.price);
@@ -94,6 +106,8 @@ function renderProducts() {
         : button.id === "wishlist-filter" && state.wishlistOnly;
     button.classList.toggle("active", Boolean(isActive));
   });
+  document.querySelector("#prime-filter").checked = state.primeOnly;
+  document.querySelector("#deal-filter").checked = state.dealsOnly;
   grid.innerHTML = visible.map((product) => {
     const saved = wishlist.includes(product.id);
     return `
@@ -107,7 +121,8 @@ function renderProducts() {
           <span class="product-category">${escapeHTML(product.category)}</span>
           <h3 class="product-name">${escapeHTML(product.name)}</h3>
           <div class="product-rating" aria-label="${product.rating} out of 5 stars">★★★★★ <span>${product.rating} (${product.reviews.toLocaleString()})</span></div>
-          <div class="price-line"><span class="product-price">${money(product.price)}</span>${product.oldPrice ? `<span class="old-price">${money(product.oldPrice)}</span>` : ""}</div>
+          <div class="price-line"><span class="product-price">${money(product.price)}</span>${product.oldPrice ? `<span class="old-price">${money(product.oldPrice)}</span><span class="savings-label">Save ${Math.round((1 - product.price / product.oldPrice) * 100)}%</span>` : ""}</div>
+          <p class="delivery-line">${primeProductIds.has(product.id) ? '<strong>prime</strong> ' : ""}FREE delivery on eligible orders</p>
           <button class="add-button" type="button" data-add="${product.id}">Add to cart</button>
         </div>
       </article>`;
@@ -185,12 +200,52 @@ function addToCart(id) {
   showToast(`${getProduct(id).name} added to cart`);
 }
 
+function renderSearchSuggestions(query) {
+  const panel = document.querySelector("#search-suggestions");
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) {
+    panel.hidden = true;
+    document.querySelector("#search").setAttribute("aria-expanded", "false");
+    return;
+  }
+  const matches = products
+    .filter((product) => `${product.name} ${product.category}`.toLowerCase().includes(normalizedQuery))
+    .slice(0, 5);
+  panel.innerHTML = matches.length
+    ? `<div class="suggestion-heading">Suggested products</div>${matches.map((product) => `
+        <button class="suggestion-option" type="button" role="option" data-suggestion="${product.id}">
+          <img src="${escapeHTML(product.image)}" alt="">
+          <span>${escapeHTML(product.name)}</span><span class="suggestion-category">${escapeHTML(product.category)}</span>
+        </button>`).join("")}`
+    : `<div class="suggestion-heading">No product suggestions</div>`;
+  panel.hidden = false;
+  document.querySelector("#search").setAttribute("aria-expanded", "true");
+}
+
+let currentSlide = 0;
+function showHeroSlide(index) {
+  currentSlide = (index + slides.length) % slides.length;
+  const slide = slides[currentSlide];
+  document.querySelector(".hero-copy .eyebrow").textContent = slide.eyebrow;
+  document.querySelector(".hero-copy h1").innerHTML = slide.title;
+  document.querySelector(".hero-copy p").textContent = slide.text;
+  document.querySelector(".hero-art").style.backgroundImage = `url("${slide.image}")`;
+  document.querySelector(".hero-art").setAttribute("aria-label", slide.eyebrow);
+  document.querySelectorAll("[data-hero-slide]").forEach((button, buttonIndex) => {
+    button.classList.toggle("active", buttonIndex === currentSlide);
+    button.setAttribute("aria-pressed", String(buttonIndex === currentSlide));
+  });
+  document.querySelector("#explore-button").setAttribute("aria-label", `Shop ${slide.category}`);
+}
+
 document.querySelector("#search-form").addEventListener("submit", (event) => {
   event.preventDefault();
   state.query = document.querySelector("#search").value;
   state.category = "All";
   state.dealsOnly = false;
   state.wishlistOnly = false;
+  document.querySelector("#search-suggestions").hidden = true;
+  document.querySelector("#search").setAttribute("aria-expanded", "false");
   renderProducts();
   document.querySelector("#shop").scrollIntoView({ behavior: "smooth", block: "start" });
 });
@@ -199,7 +254,29 @@ document.querySelector("#search").addEventListener("input", (event) => {
   state.category = "All";
   state.dealsOnly = false;
   state.wishlistOnly = false;
+  renderSearchSuggestions(event.target.value);
   renderProducts();
+});
+document.querySelector("#search-suggestions").addEventListener("click", (event) => {
+  const suggestion = event.target.closest("[data-suggestion]");
+  if (!suggestion) return;
+  const product = getProduct(suggestion.dataset.suggestion);
+  if (!product) return;
+  document.querySelector("#search").value = product.name;
+  state.query = product.name;
+  state.category = "All";
+  state.dealsOnly = false;
+  state.wishlistOnly = false;
+  document.querySelector("#search-suggestions").hidden = true;
+  document.querySelector("#search").setAttribute("aria-expanded", "false");
+  renderProducts();
+  document.querySelector("#shop").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+document.addEventListener("click", (event) => {
+  if (!event.target.closest(".search-container")) {
+    document.querySelector("#search-suggestions").hidden = true;
+    document.querySelector("#search").setAttribute("aria-expanded", "false");
+  }
 });
 document.querySelector("#search-department").addEventListener("change", () => {
   state.category = "All";
@@ -236,6 +313,36 @@ document.querySelector("#wishlist-filter").addEventListener("click", () => {
   renderProducts();
   document.querySelector("#shop").scrollIntoView({ behavior: "smooth", block: "start" });
 });
+document.querySelectorAll('input[name="price-filter"]').forEach((input) => {
+  input.addEventListener("change", (event) => {
+    state.price = event.target.value;
+    renderProducts();
+  });
+});
+document.querySelectorAll('input[name="rating-filter"]').forEach((input) => {
+  input.addEventListener("change", (event) => {
+    state.rating = Number(event.target.value);
+    renderProducts();
+  });
+});
+document.querySelector("#prime-filter").addEventListener("change", (event) => {
+  state.primeOnly = event.target.checked;
+  renderProducts();
+});
+document.querySelector("#deal-filter").addEventListener("change", (event) => {
+  state.dealsOnly = event.target.checked;
+  state.wishlistOnly = false;
+  renderProducts();
+});
+document.querySelector("#reset-refinements").addEventListener("click", () => {
+  state.price = "any";
+  state.rating = 0;
+  state.primeOnly = false;
+  state.dealsOnly = false;
+  document.querySelector('input[name="price-filter"][value="any"]').checked = true;
+  document.querySelector('input[name="rating-filter"][value="0"]').checked = true;
+  renderProducts();
+});
 document.querySelector("#product-grid").addEventListener("click", (event) => {
   const addButton = event.target.closest("[data-add]");
   const wishlistButton = event.target.closest("[data-wishlist]");
@@ -263,6 +370,7 @@ document.querySelector("#product-grid").addEventListener("click", (event) => {
           <h2>${escapeHTML(product.name)}</h2>
           <div class="product-rating">★★★★★ <span>${product.rating} (${product.reviews.toLocaleString()} reviews)</span></div>
           <span class="product-price">${money(product.price)} ${product.oldPrice ? `<span class="old-price">${money(product.oldPrice)}</span>` : ""}</span>
+          <p>${primeProductIds.has(product.id) ? '<strong class="prime-word">prime</strong> · ' : ""}FREE delivery on eligible orders</p>
           <p>${escapeHTML(product.description)}</p>
           <button class="button button-dark" type="button" data-detail-add="${product.id}">Add to cart</button>
         </div>
@@ -324,13 +432,24 @@ document.querySelector("#clear-filters").addEventListener("click", () => {
   state.category = "All";
   state.dealsOnly = false;
   state.wishlistOnly = false;
+  state.primeOnly = false;
+  state.price = "any";
+  state.rating = 0;
   state.query = "";
   document.querySelector("#search").value = "";
   document.querySelector("#search-department").value = "All";
+  document.querySelector('input[name="price-filter"][value="any"]').checked = true;
+  document.querySelector('input[name="rating-filter"][value="0"]').checked = true;
   renderProducts();
 });
 document.querySelector("#explore-button").addEventListener("click", () => {
-  document.querySelector("#shop").scrollIntoView({ behavior: "smooth" });
+  setCategory(slides[currentSlide].category);
+});
+document.querySelectorAll("[data-hero-step]").forEach((button) => {
+  button.addEventListener("click", () => showHeroSlide(currentSlide + Number(button.dataset.heroStep)));
+});
+document.querySelectorAll("[data-hero-slide]").forEach((button) => {
+  button.addEventListener("click", () => showHeroSlide(Number(button.dataset.heroSlide)));
 });
 document.querySelector("#promo-button").addEventListener("click", () => {
   state.category = "Home";
@@ -368,3 +487,4 @@ document.querySelector("#newsletter-form").addEventListener("submit", (event) =>
 
 renderProducts();
 renderCart();
+showHeroSlide(0);

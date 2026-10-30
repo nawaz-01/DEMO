@@ -9,7 +9,8 @@ Open `index.html` in a modern browser. Product photography loads from Unsplash, 
 ## Features
 
 - Responsive navigation, product grid, categories, and promotional sections
-- Product search, department/category filters, sale filter, and sorting
+- Product search with suggestions, department/category filters, Prime and sale filters, price/rating refinements, and sorting
+- Clickable featured collection carousel with category-specific shopping links
 - Product detail dialog and saved-products list
 - Shopping cart drawer with quantity controls, subtotal, and demo shipping threshold
 - Cart and saved products persisted in browser local storage
