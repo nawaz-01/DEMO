@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amazon-style Navigation</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="main-nav" aria-label="Main navigation">
+      <a class="brand nav-item" href="#" aria-label="Amazon home">
+        <span class="brand-name">amazon</span>
+        <span class="brand-smile" aria-hidden="true"></span>
+      </a>
+
+      <a class="delivery nav-item" href="#">
+        <span class="pin-icon" aria-hidden="true">⌖</span>
+        <span class="stacked-label">
+          <span class="muted-label">Deliver to</span>
+          <strong>United States</strong>
+        </span>
+      </a>
+
+      <form class="search-bar" role="search">
+        <label class="visually-hidden" for="search">Search Amazon</label>
+        <select aria-label="Search department">
+          <option>All</option>
+          <option>Books</option>
+          <option>Electronics</option>
+          <option>Home &amp; Kitchen</option>
+        </select>
+        <input id="search" type="search" placeholder="Search Amazon" required>
+        <button type="submit" aria-label="Search">
+          <span aria-hidden="true">⌕</span>
+        </button>
+      </form>
+
+      <a class="account nav-item" href="#">
+        <span class="muted-label">Hello, sign in</span>
+        <strong>Account &amp; Lists</strong>
+      </a>
+
+      <a class="orders nav-item" href="#">
+        <span class="muted-label">Returns</span>
+        <strong>&amp; Orders</strong>
+      </a>
+
+      <a class="cart nav-item" href="#">
+        <span class="cart-icon" aria-hidden="true">🛒</span>
+        <strong>Cart</strong>
+      </a>
+    </nav>
+
+    <nav class="category-nav" aria-label="Shopping categories">
+      <a class="all-link" href="#"><span aria-hidden="true">☰</span> All</a>
+      <a href="#">Today's Deals</a>
+      <a href="#">Customer Service</a>
+      <a href="#">Registry</a>
+      <a href="#">Gift Cards</a>
+      <a href="#">Sell</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Welcome to your next great find</h1>
+    <p>Use the navigation above to explore and search.</p>
+  </main>
+</body>
+</html>
