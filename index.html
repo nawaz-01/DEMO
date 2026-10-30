@@ -3,68 +3,154 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Amazon-style Navigation</title>
+  <meta name="theme-color" content="#131921">
+  <meta name="description" content="Explore popular picks across tech, home, books, and more.">
+  <title>amazon | Shop everyday essentials</title>
+  <link rel="preconnect" href="https://images.unsplash.com">
   <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
 </head>
 <body>
+  <div class="announcement">Free delivery on eligible orders over $35 <span aria-hidden="true">·</span> Shop today's picks</div>
   <header class="site-header">
     <nav class="main-nav" aria-label="Main navigation">
       <a class="brand nav-item" href="#" aria-label="Amazon home">
         <span class="brand-name">amazon</span>
         <span class="brand-smile" aria-hidden="true"></span>
       </a>
-
-      <a class="delivery nav-item" href="#">
+      <button class="delivery nav-item" id="delivery-button" type="button">
         <span class="pin-icon" aria-hidden="true">⌖</span>
-        <span class="stacked-label">
-          <span class="muted-label">Deliver to</span>
-          <strong>United States</strong>
-        </span>
-      </a>
-
-      <form class="search-bar" role="search">
-        <label class="visually-hidden" for="search">Search Amazon</label>
-        <select aria-label="Search department">
-          <option>All</option>
-          <option>Books</option>
-          <option>Electronics</option>
-          <option>Home &amp; Kitchen</option>
+        <span class="stacked-label"><span class="muted-label">Deliver to</span><strong id="delivery-location">United States</strong></span>
+      </button>
+      <form class="search-bar" id="search-form" role="search">
+        <label class="visually-hidden" for="search-department">Search department</label>
+        <select id="search-department">
+          <option value="All">All</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Home">Home &amp; Kitchen</option>
+          <option value="Books">Books</option>
+          <option value="Style">Style</option>
+          <option value="Outdoors">Outdoors</option>
         </select>
-        <input id="search" type="search" placeholder="Search Amazon" required>
-        <button type="submit" aria-label="Search">
-          <span aria-hidden="true">⌕</span>
-        </button>
+        <label class="visually-hidden" for="search">Search products</label>
+        <input id="search" type="search" placeholder="Search products" autocomplete="off">
+        <button type="submit" aria-label="Search"><span aria-hidden="true">⌕</span></button>
       </form>
-
-      <a class="account nav-item" href="#">
-        <span class="muted-label">Hello, sign in</span>
-        <strong>Account &amp; Lists</strong>
-      </a>
-
-      <a class="orders nav-item" href="#">
-        <span class="muted-label">Returns</span>
-        <strong>&amp; Orders</strong>
-      </a>
-
-      <a class="cart nav-item" href="#">
-        <span class="cart-icon" aria-hidden="true">🛒</span>
-        <strong>Cart</strong>
-      </a>
+      <button class="account nav-item" id="account-button" type="button">
+        <span class="muted-label">Hello, sign in</span><strong>Account &amp; Lists</strong>
+      </button>
+      <a class="orders nav-item" href="#orders-info"><span class="muted-label">Returns</span><strong>&amp; Orders</strong></a>
+      <button class="cart nav-item" id="cart-button" type="button" aria-label="Open cart">
+        <span class="cart-count" id="cart-count">0</span><span class="cart-icon" aria-hidden="true">🛒</span><strong>Cart</strong>
+      </button>
     </nav>
-
-    <nav class="category-nav" aria-label="Shopping categories">
-      <a class="all-link" href="#"><span aria-hidden="true">☰</span> All</a>
-      <a href="#">Today's Deals</a>
-      <a href="#">Customer Service</a>
-      <a href="#">Registry</a>
-      <a href="#">Gift Cards</a>
-      <a href="#">Sell</a>
+    <nav class="category-nav" aria-label="Shop departments">
+      <button class="all-link" type="button" data-category="All"><span aria-hidden="true">☰</span> All</button>
+      <button type="button" data-deals="true">Today's Deals</button>
+      <button type="button" data-category="Home">Home &amp; Kitchen</button>
+      <button type="button" data-category="Electronics">Electronics</button>
+      <button type="button" data-category="Books">Books</button>
+      <button type="button" data-category="Style">Fashion</button>
+      <button type="button" data-category="Outdoors">Outdoor living</button>
     </nav>
   </header>
 
   <main>
-    <h1>Welcome to your next great find</h1>
-    <p>Use the navigation above to explore and search.</p>
+    <section class="hero" aria-label="Featured collection">
+      <div class="hero-copy">
+        <span class="eyebrow">THE EVERYDAY EDIT</span>
+        <h1>Good finds.<br>Great days.</h1>
+        <p>Fresh picks for your home, your plans, and everything in between.</p>
+        <button class="button button-dark" id="explore-button" type="button">Explore the collection <span aria-hidden="true">→</span></button>
+      </div>
+      <div class="hero-art" role="img" aria-label="Sunny, relaxed home interior">
+        <span class="hero-note">A little more<br><strong>inspired</strong></span>
+      </div>
+      <div class="hero-pagination" aria-hidden="true"><span class="active"></span><span></span><span></span></div>
+    </section>
+
+    <section class="category-shortcuts" aria-label="Shop by category">
+      <button class="shortcut" type="button" data-category="Electronics"><span class="shortcut-icon">⌘</span><span>Tech &amp; gadgets</span></button>
+      <button class="shortcut" type="button" data-category="Home"><span class="shortcut-icon">⌂</span><span>Home refresh</span></button>
+      <button class="shortcut" type="button" data-category="Style"><span class="shortcut-icon">✳</span><span>Style finds</span></button>
+      <button class="shortcut" type="button" data-category="Books"><span class="shortcut-icon">▤</span><span>Books &amp; reads</span></button>
+      <button class="shortcut" type="button" data-category="Outdoors"><span class="shortcut-icon">♧</span><span>Get outside</span></button>
+    </section>
+
+    <section class="shop-section" id="shop">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">MADE FOR YOUR EVERYDAY</span>
+          <h2 id="product-heading">Popular picks</h2>
+          <p class="section-subtitle" id="result-count" aria-live="polite"></p>
+        </div>
+        <label class="sort-control">Sort by
+          <select id="sort-products">
+            <option value="featured">Featured</option>
+            <option value="price-low">Price: Low to high</option>
+            <option value="price-high">Price: High to low</option>
+            <option value="rating">Customer rating</option>
+          </select>
+        </label>
+      </div>
+      <div class="filter-row" aria-label="Product filters">
+        <button class="filter-chip active" type="button" data-category="All">All finds</button>
+        <button class="filter-chip" type="button" data-deals="true">On sale</button>
+        <button class="filter-chip" type="button" data-category="Electronics">Electronics</button>
+        <button class="filter-chip" type="button" data-category="Home">Home</button>
+        <button class="filter-chip" type="button" data-category="Books">Books</button>
+        <button class="filter-chip" type="button" data-category="Style">Style</button>
+        <button class="filter-chip" type="button" data-category="Outdoors">Outdoors</button>
+        <button class="filter-chip wishlist-filter" id="wishlist-filter" type="button">♡ Saved <span id="wishlist-count">0</span></button>
+      </div>
+      <div class="product-grid" id="product-grid" aria-live="polite"></div>
+      <div class="empty-state" id="empty-state" hidden>
+        <span aria-hidden="true">⌕</span><h3>No products found</h3><p>Try a different search or category.</p>
+        <button class="button button-dark" id="clear-filters" type="button">Clear filters</button>
+      </div>
+    </section>
+
+    <section class="promo-banner" id="orders-info">
+      <div><span class="eyebrow">SMALL DETAILS, BIG DIFFERENCE</span><h2>Make room for<br>something lovely.</h2><p>Discover little upgrades that make your everyday feel a little brighter.</p></div>
+      <button class="button button-light" id="promo-button" type="button">Find your next favorite <span aria-hidden="true">→</span></button>
+    </section>
+    <section class="newsletter">
+      <div><span class="eyebrow">A GOOD THING IN YOUR INBOX</span><h2>Stay in the know.</h2><p>Get a note when new finds and seasonal favorites arrive.</p></div>
+      <form id="newsletter-form"><label class="visually-hidden" for="newsletter-email">Email address</label><input id="newsletter-email" type="email" placeholder="Your email address" required><button class="button button-dark" type="submit">Sign me up</button></form>
+      <p class="newsletter-message" id="newsletter-message" aria-live="polite"></p>
+    </section>
   </main>
+
+  <footer class="site-footer">
+    <button class="back-to-top" id="back-to-top" type="button">Back to top ↑</button>
+    <div class="footer-main">
+      <a class="brand footer-brand" href="#" aria-label="Amazon home"><span class="brand-name">amazon</span><span class="brand-smile" aria-hidden="true"></span></a>
+      <p>Thoughtful picks for the things you do every day.</p>
+      <span>Demo storefront · No real purchases or payments</span>
+    </div>
+    <div class="footer-bottom">© 2026 Everyday Finds. This is an independent demo storefront.</div>
+  </footer>
+
+  <div class="overlay" id="overlay" hidden></div>
+  <aside class="cart-drawer" id="cart-drawer" aria-label="Shopping cart" aria-hidden="true">
+    <div class="drawer-header"><div><span class="eyebrow">YOUR BAG</span><h2>Your cart <span id="drawer-item-count">(0)</span></h2></div><button class="icon-button" id="close-cart" type="button" aria-label="Close cart">×</button></div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-empty" id="cart-empty"><span aria-hidden="true">🛍</span><h3>Your cart is waiting</h3><p>Find something lovely for your everyday.</p><button class="button button-dark" id="continue-shopping" type="button">Continue shopping</button></div>
+    <div class="cart-summary" id="cart-summary">
+      <p><span>Subtotal</span><strong id="cart-subtotal">$0.00</strong></p><p class="shipping-note" id="shipping-note"></p>
+      <button class="button checkout-button" id="checkout-button" type="button">Continue to checkout <span aria-hidden="true">→</span></button>
+      <small>Demo only: checkout does not process payments.</small>
+    </div>
+  </aside>
+
+  <dialog class="product-dialog" id="product-dialog">
+    <button class="icon-button dialog-close" type="button" aria-label="Close product details">×</button>
+    <div id="product-detail"></div>
+  </dialog>
+  <dialog class="message-dialog" id="message-dialog">
+    <button class="icon-button dialog-close" type="button" aria-label="Close message">×</button>
+    <div id="message-content"></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
